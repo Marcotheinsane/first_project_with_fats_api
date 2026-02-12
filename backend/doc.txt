@@ -1,0 +1,133 @@
+This is my form to undesrtand that syntaxis
+
+async function myFunction() {
+  // Your code here
+}
+what is  async function?
+An a synchronous function is a function that operates asynchronously via the event loop,
+ allowing for non-blocking operations. It can contain one or more await expressions that pause 
+ the execution of the function until a Promise is resolved. This allows for better performance and responsiveness
+  in applications, especially when dealing with I/O operations, such as fetching data from an API or reading files.
+
+in simply terms An async allow you to write code that look s synchronous but is actually asynchronous. 
+
+
+now mi fist example of async function 
+# esta es la base de mi api
+from fastapi import FastAPI
+#para poder validar datos de forma rapida la razon para usar fastapi es pydantic
+from pydantic import BaseModel
+
+#esta es una instacia de mi api
+#la defino siempre como app, para que sea mas facil de usar en otros archivos, como por ejemplo en el uvicorn main:app --reload
+app = FastAPI()
+
+class persona(BaseModel):
+    nombre: str
+    edad: int
+
+
+#esta es la ruta de mi api 
+@app.get("/")
+
+
+#this es el endpoint de mi api,
+#el cual se ejecuta cuando se hace una peticion get a la raiz de mi
+# despues llamo a uvicorn main:app --reload que es igual un npm start dev, para iniciar el servidor de mi api
+async def read_root():
+    return {"Hello": "World"}    
+
+#puedo tener muchos endpoints en mi api, por ejemplo este es otro endpoint pero
+#debo definirlo con una ruta diferente, por ejemplo /persona/edad para que no se confunda con el endpoint anterior
+@app.get("/persona/edad")
+# este endpoint recibe un parametro de tipo persona, que es un objeto con dos propiedades, nombre y edad, y devuelve un diccionario con el nombre y la edad de la persona
+async def post_persona(persona: persona):
+    return {"nombre": persona.nombre, "edad": persona.edad}
+
+
+
+chat gpt give me an example of the structure a fastapu project 
+backend/
+│
+├── app/
+│   ├── main.py
+│   ├── config.py
+│   ├── database.py
+│
+│   ├── models/
+│   │   └── solicitud.py
+│
+│   ├── schemas/
+│   │   └── solicitud.py
+│
+│   ├── routers/
+│   │   └── solicitudes.py
+│
+│   └── services/
+│       └── solicitud_service.py
+│
+├── alembic/
+└── requirements.txt
+
+
+-------------------
+el flujo de trabajo es el siguiente
+vue hace una petecion axios a la api que esta en el backend, la api escuha y recibe la peticion routing , luego la api hace una consulta a la base de datos, obtiene los datos y los devuelve a la api, luego la api devuelve los datos a la peticion axios que hizo vue y finalmente vue muestra los datos en el frontend 
+
+vue -> axios -> api -> database
+o aun mas tecnico
+
+ → axios.post()
+ → FastAPI router
+ → schema valida que ese objeto cumple con las reglas definidas
+ → service guarda ese objeto en la base de datos
+ → SQLAlchemy inserta ese objeto en la base de datos
+ → Postgres guarda ese objeto en la base de datos
+ → respuesta JSON que devuelve la api a axios
+ → Vue actualiza estado con la respuesta de la api
+
+ --SQlAlchemy es un ORM que permite interactuar con la base de datos comparado a la VTM de django que es un ORM pero con una sintaxis diferente,
+  SQLAlchemy es mas flexible y permite usar diferentes bases de datos, mientras que la VTM de django solo permite
+   usar la base de datos que viene por defecto, que es sqlite.
+
+en este projecto usare postgres
+
+para entender esto en main = settings.py + urls.py + manage.py (django)
+
+Aqui en main se hace todo, Se crea la app,registro de routers configuracion de cors y arrancar el servidor
+usualmente tiene FastAPI() y include_router() y uvicorn.run() para arrancar el servidor, pero en este caso no usaremos uvicorn.run() porque usaremos el comando uvicorn main:app --reload para arrancar el servidor, lo que nos permite tener un mejor control sobre el servidor y no tener que preocuparse por el arranque del servidor cada vez que hacemos un cambio en el codigo.
+nada de logica 
+
+/Schemas 
+es simples palabras es la validacion de datos =Forms, serializers(django)
+aqui se definen como llegan y como salen los datos
+
+Schema	Para qué sirve
+SolicitudCreate -> cuando Vue envía datos
+SolicitudUpdate -> Cuando se modifica
+SolicitudResponse -> Lo que devuelves
+
+/models 
+aqui es donde SqlAlchemy se encarga de crear las tablas en la base de datos, aqui se define la estructura de la tabla 
+y las relaciones entre tablas, es decir, es el modelo de datos 
+= Models de django
+
+/routers
+rutas y paths
+Aqui defino los endpoints de mi api, es decir, las rutas que va a escuchar mi api 
+y las funciones que se van a ejecutar cuando se haga una peticion a esa ruta, es decir, es el controlador de mi api
+
+usualmenet vue hace algo parecido a esto
+
+Vue Form
+ → axios.post()
+ → router (solicitudes.py)
+ → schema valida
+ → model guarda
+ → respuesta JSON
+
+ ademas de agregar 2 archivos mas, config.py y database.py
+config.py es donde se guardan las variables de entorno, como por ejemplo la url de la base de datos, el puerto del servidor, etc
+que usare mas tarde para poder conectar mi api con la base de datos y configurar el servidor
+database.py es donde se configura la conexion a la base de datos, aqui se crea el engine
+de sqlalchemy y se define la sessionmaker, que es la clase que se encarga de crear las sesiones de conexion a la base de datos, y se define la base de datos, que es la clase que se encarga de crear las tablas en la base de datos.
